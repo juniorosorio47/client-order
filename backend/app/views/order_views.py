@@ -25,3 +25,26 @@ def orders_list(request):
             return Response(status=status.HTTP_201_CREATED)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['DELETE'])
+def order_delete(request, pk):
+    try:
+        order = Order.objects.get(pk=pk)
+    except Order.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    # if request.method == 'GET':
+    #     serializer = EncoderSerializer(encoder)
+    #     return Response(serializer.data)
+
+    # if request.method == 'PUT':
+    #     serializer = EncoderSerializer(encoder, data=request.data,context={'request': request})
+    #     if serializer.is_valid():
+    #         serializer.save()
+    #         return Response(status=status.HTTP_204_NO_CONTENT)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    # elif request.method == 'DELETE':
+    order.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)

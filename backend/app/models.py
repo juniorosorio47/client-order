@@ -19,7 +19,7 @@ class Product(models.Model):
 # Order model
 class Order(models.Model):
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, blank=True, null=True)
-    products = models.ForeignKey(Product, on_delete=models.SET_NULL, blank=True, null=True)
+    products = models.ManyToManyField(Product)
     amount = models.IntegerField()
 
     def _str_(self):
