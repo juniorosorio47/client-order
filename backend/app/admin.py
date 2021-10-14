@@ -12,7 +12,7 @@ class ProductAdmin(admin.ModelAdmin):
 
 class OrderAdmin(admin.ModelAdmin):
     filter_horizontal = ('products',)
-    list_display = ('id', 'client', 'get_products', 'amount')
+    list_display = ('id', 'client', 'get_products')
 
     def get_products(self, obj):
         return ", ".join([str(p) for p in obj.products.all()])

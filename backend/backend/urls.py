@@ -16,14 +16,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from app import views
+from rest_framework_jwt.views import obtain_jwt_token
 
 urlpatterns = [
+    path('token-auth/', obtain_jwt_token),
     path('admin/', admin.site.urls),
 
     path('api/clients/', views.clients_list),
+    path('api/clients/<int:pk>', views.client_detail),
 
     path('api/products/', views.products_list),
+    path('api/products/<int:pk>', views.product_detail),
 
     path('api/orders/', views.orders_list),
-    path('api/orders/<int:pk>', views.order_delete),
+    path('api/orders/<int:pk>', views.order_detail),
 ]
