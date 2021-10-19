@@ -7,15 +7,11 @@ class ClientAdmin(admin.ModelAdmin):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'price', 'stock_amount')
+    list_display = ('id', 'name', 'price', 'inventory')
 
 
 class OrderAdmin(admin.ModelAdmin):
-    filter_horizontal = ('products',)
-    list_display = ('id', 'client', 'get_products')
-
-    def get_products(self, obj):
-        return ", ".join([str(p) for p in obj.products.all()])
+    list_display = ['id', 'client', 'user']
 
 
 admin.site.register(Client, ClientAdmin)

@@ -10,12 +10,16 @@ class Order(models.Model):
 
     client = models.ForeignKey(Client, on_delete=models.SET_NULL, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
-    products = models.ManyToManyField(Product, related_name="products")
+    products = models.ManyToManyField(Product, through='OrderProduct')
     total = models.DecimalField(default=0.00, decimal_places=2, max_digits=20)
     timestamp = models.DateTimeField(auto_now_add=True)
 
-    def _str_(self):
-        return self.id
+    def __str__(self):
+        return f'Order {self.id}'
+        
+    # def get_total_cost(self):
+    #     return sum(item.get_cost() for item in self.items.all())
+
 
 # OrderProduct model
 class OrderProduct(models.Model):
@@ -23,7 +27,8 @@ class OrderProduct(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
 
-
-
     class Meta:
         unique_together = ('order', 'product')
+
+    def get_cost(self):
+        return self.product.price * self.quantity

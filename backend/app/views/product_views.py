@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -8,8 +9,10 @@ from ..models import Product
 
 
 # Get all products and create new products
+# @login_required
 @api_view(['GET', 'POST'])
 def products_list(request):
+    user = request.user
 
     if request.method == 'GET':
         data = Product.objects.all()
@@ -19,14 +22,26 @@ def products_list(request):
         return Response(serializer.data)
 
     elif request.method == 'POST':
-        
-        serializer = ProductSerializer(data=request.data)
+        product_request = request.data
+
+        product_request['user'] = user.id
+
+        serializer = ProductSerializer(data=product_request)
         if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_201_CREATED)
+            product = serializer.save()
+            
+            response = {
+                'id': product.id,
+                'name': product.name,
+                'price': product.price,
+                'inventory': product.inventory,
+                'user': product.user.username,
+            }
+            return Response(response, status=status.HTTP_201_CREATED)
             
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+# @login_required
 @api_view(['GET', 'PUT', 'DELETE'])
 def product_detail(request, pk):
     

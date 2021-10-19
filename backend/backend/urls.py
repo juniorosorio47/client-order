@@ -16,11 +16,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from app import views
-from rest_framework_jwt.views import obtain_jwt_token
+from rest_framework_jwt.views import obtain_jwt_token 
 
 urlpatterns = [
-    path('token-auth/', obtain_jwt_token),
     path('admin/', admin.site.urls),
+
+    path('token-auth/', obtain_jwt_token),
+    path('current_user/', views.current_user),
+
+    path('users/', views.UserList.as_view()),
 
     path('api/clients/', views.clients_list),
     path('api/clients/<int:pk>', views.client_detail),
