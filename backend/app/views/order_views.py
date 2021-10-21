@@ -14,8 +14,8 @@ Object structure of an order to be created:
 order = {
     "client": 1,
     "products": [
-			{"id": 1, "quantity":1},
-			{"id": 3, "quantity":3}
+			{"id": 1, "quantity":2, "sell_price": 230},
+			{"id": 2, "quantity":1, "sell_price": 100}
     ]
 }
 
@@ -51,7 +51,7 @@ def orders_list(request):
         order_request = request.data
         client = order_request['client']
         user = request.user
-        has_inventory = check_products_inventory(order_request['products'])
+        has_inventory = check_products_inventory_and_multiple(order_request['products'])
 
         order_items = {
             'items':[],
@@ -79,8 +79,10 @@ def orders_list(request):
                     product = get_object_or_404(Product, pk=item['id'])
 
                     quantity = item['quantity']
+                    sell_price = item['sell_price']
                     price = product.price
-                    order_items['total'] = order_items['total'] + quantity*price
+
+                    order_items['total'] = order_items['total'] + quantity*sell_price
                     
                     # Decrease product inventory
                     product.decrease_inventory(quantity= item['quantity'])
@@ -91,13 +93,14 @@ def orders_list(request):
                         'id': product.id,
                         'name':product.name,
                         'price':price,
+                        'sell_price':sell_price,
                         'quantity':quantity,
-                        'total_price': quantity*price
+                        'total_price': quantity*sell_price
                     }
 
                     order_items['items'].append(product_data)
 
-                    final_order.products.add(product, through_defaults={'quantity': int(quantity)})
+                    final_order.products.add(product, through_defaults={'quantity': int(quantity), 'price':sell_price})
                     
                 final_order.total = order_items['total']
 
@@ -122,7 +125,7 @@ def orders_list(request):
        
 
 
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(['GET'])
 def order_detail(request, pk):
     
     order = get_object_or_404(Order, pk=pk)
@@ -139,7 +142,7 @@ def order_detail(request, pk):
                 'name':item.name,
                 'price':price,
                 'quantity':quantity,
-                'total_price': quantity*price
+                'total_price': quantity*sell_price
             }
 
             products.append(product_data)
@@ -153,37 +156,30 @@ def order_detail(request, pk):
 
         return Response(response)
 
-    if request.method == 'PUT':
-        serializer = OrderSerializer(order, data=request.data,context={'request': request})
-
-        if serializer.is_valid():
-            serializer.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-
-    elif request.method == 'DELETE':
-        # On delete an order we need to add the product inventory again
-        # product.increase_inventory(quantity)
-        order.delete()
-        
-        return Response(status=status.HTTP_204_NO_CONTENT)
-
 
 # Validates if all products has enough inventory
 # If does not have enough inventory will add an error for each item (without inventory) to the errors array. Then return the array if it is not empty
-def check_products_inventory(products_list):
+def check_products_inventory_and_multiple(products_list):
     errors = []
 
     for item in products_list:
         try:
             product = get_object_or_404(Product, pk=item['id'])
 
+            # Checks if the product has inventory
             if product.has_inventory(quantity=item['quantity']):
                 print(f'Product with id={product.id} have enough inventory')
             
             else:
                 errors.append(f'Product with id={product.id} have only {product.inventory} items in inventory')
+
+            # Checks if the quantity follow the multiple rule
+            if product.check_multiple(quantity=item['quantity']):
+                print(f'The quantity is multiple of {product.multiple}')
+            
+            else:
+                errors.append(f'The Product with id={product.id} quantity can only be multiple of {product.multiple}')
+            
 
         except Product.DoesNotExist:
             errors.append(f'Product with id {item.id} not found.')

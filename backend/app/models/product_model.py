@@ -8,6 +8,7 @@ class Product(models.Model):
     name = models.CharField(max_length=120, unique=True)
     price = models.DecimalField(default=0.00, decimal_places=2, max_digits=20)
     inventory = models.IntegerField(default=0)
+    multiple = models.IntegerField(default=None, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
 
     def _str_(self):
@@ -25,3 +26,9 @@ class Product(models.Model):
     
     def increase_inventory(self, quantity):
         self.inventory += quantity
+
+    def check_multiple(self, quantity):
+        if self.multiple:
+            return quantity%self.multiple==0
+        else:
+            return None

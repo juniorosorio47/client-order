@@ -25,6 +25,7 @@ class Order(models.Model):
 class OrderProduct(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    price = models.DecimalField(default=0.00, decimal_places=2, max_digits=20)
     quantity = models.IntegerField(default=1)
 
     class Meta:
