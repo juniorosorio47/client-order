@@ -21,10 +21,10 @@ from rest_framework_jwt.views import obtain_jwt_token
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('token-auth/', obtain_jwt_token),
-    path('current_user/', views.current_user),
+    path('api/token-auth/', obtain_jwt_token),
+    path('api/current_user/', views.current_user),
 
-    path('users/', views.UserList.as_view()),
+    path('api/users/', views.UserList.as_view()),
 
     path('api/clients/', views.clients_list),
     path('api/clients/<int:pk>', views.client_detail),

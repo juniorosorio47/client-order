@@ -15,7 +15,7 @@ def products_list(request):
     user = request.user
 
     if request.method == 'GET':
-        data = Product.objects.all()
+        data = Product.objects.all().order_by('-id')
 
         serializer = ProductSerializer(data, context={'request': request}, many=True)
 
