@@ -22,28 +22,34 @@ export default function Table({ columns, editRecord, data, ...rest }) {
     - react-table doesn't have UI, it's headless. We just need to put the react-table props from the Hooks, and it will do its magic automatically
   */
   return (
-    <BootstrapTable striped bordered hover responsive {...rest} {...getTableProps()}>
-      <thead>
-        {headerGroups.map(headerGroup => (
-          <tr {...headerGroup.getHeaderGroupProps()}>
-            {headerGroup.headers.map(column => (
-              <th {...column.getHeaderProps()}>{column.render("Header")}</th>
-            ))}
-          </tr>
-        ))}
-      </thead>
-      <tbody {...getTableBodyProps()}>
-        {rows.map((row, i) => {
-          prepareRow(row);
-          return (
-            <tr {...row.getRowProps()}>
-              {row.cells.map(cell => {
-                return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
-              })}
+    <BootstrapTable striped bordered hover {...rest} {...getTableProps()}>
+        <thead>
+          {headerGroups.map(headerGroup => (
+            <tr {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map(column => (
+                <th {...column.getHeaderProps()}>{column.render("Header")}</th>
+                ))}
             </tr>
-          );
-        })}
-      </tbody>
+          ))}
+        </thead>
+      {rows.length > 0? <>
+        <tbody {...getTableBodyProps()}>
+          {rows.map((row, i) => {
+            prepareRow(row);
+            return (
+              <tr {...row.getRowProps()}>
+                {row.cells.map(cell => {
+                  return <td {...cell.getCellProps()}>{cell.render("Cell")}</td>;
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </>
+      :<tbody>
+        <tr className="text-center w-100">Tabela vazia.</tr>
+      </tbody>}
+      
     </BootstrapTable>
   );
 }

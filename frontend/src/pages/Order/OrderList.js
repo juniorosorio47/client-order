@@ -3,7 +3,7 @@ import { useHistory } from "react-router-dom";
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
-import { faEdit } from '@fortawesome/free-solid-svg-icons';
+import { faInfo } from '@fortawesome/free-solid-svg-icons';
 import Button from 'react-bootstrap/Button';
 
 import api from "../../services/api";
@@ -12,20 +12,20 @@ import { logout } from "../../services/auth";
 import { Header } from '../../components/Header';
 import  Table  from '../../components/Table';
 
-import { ProductForm } from './ProductForm';
+import { OrderForm } from './OrderForm';
 
-export const ProductList = () => {
+export const OrderList = () => {
     let history = useHistory();
     
     const [tableData, setTableData] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [editForm, setEditForm] = useState(false);
-    const [formProductId, setFormProductId] = useState(0);
+    const [formOrderId, setFormOrderId] = useState(0);
     const [formName, setFormName] = useState('');
 
     const refreshList = async () => {
       try{
-        const response = await api.get("/products/");
+        const response = await api.get("/orders/");
         
         setTableData(response.data) 
         console.log(tableData)
@@ -44,17 +44,17 @@ export const ProductList = () => {
       refreshList()
     }, [])
     
-    const handleAddProduct = e => {
+    const handleAddOrder = e => {
       // console.log(e);
       setEditForm(false);
       setShowForm(!showForm);
-      setFormName('Novo Produto');
+      setFormName('Nova venda');
     }
 
-    const editTable = async (e) => {
-      setFormProductId(e.currentTarget.value)
+    const showOrder = async (e) => {
+      setFormOrderId(e.currentTarget.value)
 
-      setFormName(`Editar produto #${e.currentTarget.value}`);
+      setFormName(`Ordem de venda #${e.currentTarget.value}`);
       
       setEditForm(true);
       setShowForm(true);
@@ -62,11 +62,11 @@ export const ProductList = () => {
     }
 
     const deleteProduct = async (e) => {
-      const productId = e.currentTarget.value;
+      const orderId = e.currentTarget.value;
 
       try{
-        const response = await api.delete(`/products/${productId}`);
-        await refreshList()
+        const response = await api.delete(`/orders/${orderId}`);
+        await refreshList();
         
       }catch(err){
         console.log(err)
@@ -78,28 +78,32 @@ export const ProductList = () => {
         () => [
       
             {
-              Header: 'Produtos',
+              Header: 'Vendas',
               columns: [
                 {
                   Header: '#',
                   accessor: 'id',
                 },
                 {
-                  Header: 'Nome',
-                  accessor: 'name',
+                  Header: 'Cliente',
+                  accessor: 'client',
                 },
                 {
-                  Header: 'Preço (R$)',
-                  accessor: 'price',
-                  Cell: ({ cell }) =>(parseFloat(cell.row.values.price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }))
+                  Header: 'Usuário',
+                  accessor: 'user',
                 },
                 {
-                  Header: 'Estoque',
-                  accessor: 'inventory',
+                  Header: 'Produtos',
+                  accessor: 'products_count',
                 },
                 {
-                  Header: 'Múltiplo',
-                  accessor: 'multiple',
+                  Header: 'Quantidade',
+                  accessor: 'items',
+                },
+                {
+                  Header: 'Total (R$)',
+                  accessor: 'total',
+                  Cell: ({ cell }) =>(cell.row.values.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }))
                 },
                 {
                   Header: 'Ações',
@@ -107,8 +111,8 @@ export const ProductList = () => {
                   accessor: 'id',
                   width: 30,
                   Cell: ({ cell }) => (<div className="d-flex justify-content-around m-0 p-0 ">
-                      <Button type="button" className="btn btn-secondary " value={cell.row.values.id} onClick={editTable}>
-                        <FontAwesomeIcon icon={faEdit} className=""/>
+                      <Button type="button" className="btn btn-secondary " value={cell.row.values.id} onClick={showOrder}>
+                        <FontAwesomeIcon icon={faInfo} className=""/>
                       </Button>
                       <Button type="button" className="btn btn-danger" value={cell.row.values.id} onClick={deleteProduct}>
                         <FontAwesomeIcon icon={faTrash} className="" />
@@ -126,22 +130,22 @@ export const ProductList = () => {
         <div>
 
             <Header 
-                name="Lista de produtos"
+                name="Lista de vendas"
                 addButtonText="Adicionar"
-                handleAdd = {handleAddProduct}
+                handleAdd = {handleAddOrder}
             />
             <hr/>
-            {showForm ? <><ProductForm 
+            {showForm ? <><OrderForm 
                             formName={formName} 
                             setShowForm={setShowForm} 
                             refreshList={refreshList}
-                            formProductId={formProductId}
+                            formOrderId={formOrderId}
                             editForm={editForm}
                             showForm={showForm}
                           />
                             <hr/> </>:<></>}
 
-            <Table columns={tableColumns} data={tableData} editRecord={editTable}/>
+            <Table columns={tableColumns} data={tableData} editRecord={showOrder}/>
             
         </div>
     )

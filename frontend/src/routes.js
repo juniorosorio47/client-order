@@ -10,6 +10,7 @@ import Login from './pages/Login';
 
 import { ProductList } from './pages/Product/ProductList';
 import { ClientList } from './pages/Client/ClientList';
+import { OrderList } from './pages/Order/OrderList';
 
 const PrivateRoutes = ({component: Component, ...rest}) => (
     <Route {...rest} render={props=>(
@@ -30,9 +31,10 @@ const Routes = () => (
             <GlobalNavbar/>
             <Container lg={6}  className=" align-items-center justify-content-center " >
                 <Switch>
-                    <PrivateRoutes exact path="/" component={() => <h1>Hsssssss<p>ssssssss</p>ssssssssssssssssssssssssssssssssssss ome</h1>} />
+                    <PrivateRoutes exact path="/" component={OrderList} />
                     <PrivateRoutes exact path="/products" component={ProductList} />
                     <PrivateRoutes exact path="/clients" component={ClientList} />
+                    <PrivateRoutes exact path="/orders" component={OrderList} />
                 </Switch>
             </Container>
         </BrowserRouter>

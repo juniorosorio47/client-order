@@ -39,6 +39,9 @@ export const ProductForm = ({refreshList, setShowForm, formName, editForm, formP
 
     const onSubmit = async data => {
         console.log(data);
+        if(data.multiple==''){
+            data.multiple = 1;
+        }
 
         try{
             if(editForm){
@@ -46,6 +49,7 @@ export const ProductForm = ({refreshList, setShowForm, formName, editForm, formP
 
             }else{
                 await api.post("/products/", data);
+                console.log(data)
 
             }
 

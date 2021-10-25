@@ -7,6 +7,7 @@ from ..serializers import OrderSerializer, ProductSerializer
 from ..models import Order, Product, Client, OrderProduct
 from django.contrib.auth import get_user_model
 from django.db.models import Sum
+import time as sleep
 
 
 '''
@@ -81,8 +82,14 @@ def orders_list(request):
                     quantity = item['quantity']
                     sell_price = item['sell_price']
                     price = product.price
+                    print(order_items['total'])
+                    print('quantity',quantity)
+                    print('sell',sell_price)
+                    print(quantity*sell_price)
 
-                    order_items['total'] = order_items['total'] + quantity*sell_price
+                    # sleep(10)
+
+                    order_items['total'] = order_items['total'] + int(quantity)*float(sell_price)
                     
                     # Decrease product inventory
                     product.decrease_inventory(quantity= item['quantity'])
@@ -139,6 +146,7 @@ def order_detail(request, pk):
             quantity = orderProduct.quantity
             
             sell_price = orderProduct.price
+            print(sell_price)
 
 
             product_data = {
@@ -154,7 +162,8 @@ def order_detail(request, pk):
 
         response = {
             'user': order.user.username,
-            'client': order.client,
+            'client_id': order.client.id,
+            'client': order.client.name,
             'order':order.id,
             'products': products,
         }
@@ -197,7 +206,11 @@ def check_products_inventory_and_multiple(products_list):
 
             # Checks if the quantity follow the multiple rule
             if product.check_multiple(quantity=item['quantity']):
+
                 print(f'The quantity is multiple of {product.multiple}')
+
+            elif(product.multiple==None):
+                pass
             
             else:
                 errors.append(f'The Product with id={product.id} quantity can only be multiple of {product.multiple}')
