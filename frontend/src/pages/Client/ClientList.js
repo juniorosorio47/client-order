@@ -1,31 +1,31 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { useHistory } from "react-router-dom";
 
+import Button from 'react-bootstrap/Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
-import Button from 'react-bootstrap/Button';
 
 import api from "../../services/api";
 import { logout } from "../../services/auth";
 
-import { Header } from '../../components/Header';
-import  Table  from '../../components/Table';
+import { Header } from '../../components/Header'
+import  Table  from '../../components/Table'
 
-import { ProductForm } from './ProductForm';
+import { ClientForm } from './ClientForm'
 
-export const ProductList = () => {
+export const ClientList = () => {
     let history = useHistory();
     
     const [tableData, setTableData] = useState([]);
     const [showForm, setShowForm] = useState(false);
     const [editForm, setEditForm] = useState(false);
-    const [formProductId, setFormProductId] = useState(0);
+    const [formClientId, setFormClientId] = useState(0);
     const [formName, setFormName] = useState('');
 
     const refreshList = async () => {
       try{
-        const response = await api.get("/products/");
+        const response = await api.get("/clients/");
         
         setTableData(response.data) 
         console.log(tableData)
@@ -44,17 +44,18 @@ export const ProductList = () => {
       refreshList()
     }, [])
     
-    const handleAddProduct = e => {
+    const handleAddClient = e => {
       // console.log(e);
       setEditForm(false);
       setShowForm(!showForm);
-      setFormName('Novo Produto');
+      setFormName('Novo Cliente');
     }
 
     const editTable = async (e) => {
-      setFormProductId(e.currentTarget.value)
+      console.log(e.currentTarget)
+      setFormClientId(e.currentTarget.value)
 
-      setFormName(`Editar produto #${e.currentTarget.value}`);
+      setFormName(`Editar cliente #${e.currentTarget.value}`);
       
       setEditForm(true);
       setShowForm(true);
@@ -62,10 +63,10 @@ export const ProductList = () => {
     }
 
     const deleteProduct = async (e) => {
-      const productId = e.currentTarget.value;
+      const clientId = e.currentTarget.value;
 
       try{
-        const response = await api.delete(`/products/${productId}`);
+        const response = await api.delete(`/clients/${clientId}`);
         await refreshList()
         
       }catch(err){
@@ -78,7 +79,7 @@ export const ProductList = () => {
         () => [
       
             {
-              Header: 'Produtos',
+              Header: 'Clientes',
               columns: [
                 {
                   Header: '#',
@@ -87,18 +88,6 @@ export const ProductList = () => {
                 {
                   Header: 'Nome',
                   accessor: 'name',
-                },
-                {
-                  Header: 'Preço (R$)',
-                  accessor: 'price',
-                },
-                {
-                  Header: 'Estoque',
-                  accessor: 'inventory',
-                },
-                {
-                  Header: 'Múltiplo',
-                  accessor: 'multiple',
                 },
                 {
                   Header: 'Ações',
@@ -110,7 +99,7 @@ export const ProductList = () => {
                         <FontAwesomeIcon icon={faEdit} className=""/>
                       </Button>
                       <Button type="button" className="btn btn-danger" value={cell.row.values.id} onClick={deleteProduct}>
-                        <FontAwesomeIcon icon={faTrash} className="" />
+                        <FontAwesomeIcon icon={faTrash} className=""/>
                       </Button>
                     </div>
                   )
@@ -125,16 +114,16 @@ export const ProductList = () => {
         <div>
 
             <Header 
-                name="Lista de produtos"
+                name="Lista de clientes"
                 addButtonText="Adicionar"
-                handleAdd = {handleAddProduct}
+                handleAdd = {handleAddClient}
             />
             <hr/>
-            {showForm ? <><ProductForm 
+            {showForm ? <><ClientForm 
                             formName={formName} 
                             setShowForm={setShowForm} 
                             refreshList={refreshList}
-                            formProductId={formProductId}
+                            formClientId={formClientId}
                             editForm={editForm}
                             showForm={showForm}
                           />

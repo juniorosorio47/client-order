@@ -7,8 +7,9 @@ import { isAuthenticated } from './services/auth'
 import { GlobalNavbar } from './components/Nav'
 
 import Login from './pages/Login';
+
 import { ProductList } from './pages/Product/ProductList';
-import { ProductDetails } from './pages/Product/ProductDetails';
+import { ClientList } from './pages/Client/ClientList';
 
 const PrivateRoutes = ({component: Component, ...rest}) => (
     <Route {...rest} render={props=>(
@@ -31,7 +32,7 @@ const Routes = () => (
                 <Switch>
                     <PrivateRoutes exact path="/" component={() => <h1>Hsssssss<p>ssssssss</p>ssssssssssssssssssssssssssssssssssss ome</h1>} />
                     <PrivateRoutes exact path="/products" component={ProductList} />
-                    <PrivateRoutes path="/products/:id" component={ProductDetails} />
+                    <PrivateRoutes exact path="/clients" component={ClientList} />
                 </Switch>
             </Container>
         </BrowserRouter>
