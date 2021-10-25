@@ -16,6 +16,9 @@ class Order(models.Model):
 
     def __str__(self):
         return f'Order {self.id}'
+
+    def getClientName(self):
+        return self.client.name
         
     # def get_total_cost(self):
     #     return sum(item.get_cost() for item in self.items.all())
@@ -32,4 +35,4 @@ class OrderProduct(models.Model):
         unique_together = ('order', 'product')
 
     def get_cost(self):
-        return self.product.price * self.quantity
+        return self.price * self.quantity

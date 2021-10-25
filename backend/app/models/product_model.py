@@ -8,7 +8,7 @@ class Product(models.Model):
     name = models.CharField(max_length=120, unique=True)
     price = models.DecimalField(default=0.00, decimal_places=2, max_digits=20)
     inventory = models.IntegerField(default=0)
-    multiple = models.IntegerField(default=None, blank=True, null=True)
+    multiple = models.IntegerField(default=1, blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True)
 
     def _str_(self):

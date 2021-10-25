@@ -28,16 +28,16 @@ def orders_list(request):
 
     if request.method == 'GET':
 
-        data = Order.objects.all()
+        data = Order.objects.all().order_by('-id')
         response = []
 
         for order in data:
             items = OrderProduct.objects.filter(order=order).aggregate(Sum('quantity'))
 
             order_list_item = {
-                'user': order.user.id,
-                'client': order.client.id,
-                'order':order.id,
+                'id':order.id,
+                'user': order.user.username,
+                'client': order.client.name,
                 'total': order.total,
                 'products_count': order.products.count(),
                 'items': items['quantity__sum'],
@@ -125,22 +125,27 @@ def orders_list(request):
        
 
 
-@api_view(['GET'])
+@api_view(['GET', 'DELETE'])
 def order_detail(request, pk):
     
     order = get_object_or_404(Order, pk=pk)
+    
 
     if request.method == 'GET':
         products = []
 
         for item in order.products.all():
-            quantity = OrderProduct.objects.get(order=order, product=item).quantity
-            price = item.price
+            orderProduct = OrderProduct.objects.get(order=order, product=item)
+            quantity = orderProduct.quantity
+            
+            sell_price = orderProduct.price
+
 
             product_data = {
                 'id': item.id,
                 'name':item.name,
-                'price':price,
+                'price':item.price,
+                'sell_price':sell_price,
                 'quantity':quantity,
                 'total_price': quantity*sell_price
             }
@@ -148,13 +153,30 @@ def order_detail(request, pk):
             products.append(product_data)
 
         response = {
-            'user': order.user.id,
-            'client': order.client.id,
+            'user': order.user.username,
+            'client': order.client,
             'order':order.id,
             'products': products,
         }
 
         return Response(response)
+
+    elif request.method == 'DELETE':
+
+        for item in order.products.all():
+            quantity = OrderProduct.objects.get(order=order, product=item).quantity
+            product = get_object_or_404(Product, pk=item.id)
+
+
+            product.increase_inventory(quantity=quantity)
+            product.save()
+
+
+            order.products.remove(product)
+
+        order.delete()
+        
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 # Validates if all products has enough inventory
