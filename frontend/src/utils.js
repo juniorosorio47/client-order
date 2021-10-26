@@ -8,13 +8,13 @@ export const getProfit = (price, sell_price)=>{
     console.log("Profit", profit)
 
     if(profit>=1.1){
-        return <Badge className='badge' bg="success">{profit}</Badge>  
+        return <Badge className='badge' bg="success">Ótima</Badge>  
     }
     if(profit<1.1 && profit>=1){
-        return <Badge className='badge' bg="primary">{profit}</Badge>  
+        return <Badge className='badge' bg="primary">Boa</Badge>  
     }
     else if(profit<0.9){
-        return <Badge className='badge' bg="danger">{profit}</Badge>  
+        return <Badge className='badge' bg="danger">Ruim</Badge>  
     }
 
 }
